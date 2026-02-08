@@ -8,6 +8,12 @@ type LandingPageProps = {
   link: Link
 }
 
+const THEME_BACKGROUNDS: Record<number, string> = {
+  1: '/backgrounds/bg1.jpg',
+  2: '/backgrounds/bg2.jpg',
+  3: '/backgrounds/bg3.jpg',
+}
+
 const THEME_COLORS: Record<number, { 
   primary: string
   secondary: string
@@ -21,13 +27,13 @@ const THEME_COLORS: Record<number, {
     emoji: '❤️'
   },
   2: { 
-    primary: '#FFB3D9', 
+    primary: '#FFB3D9',
     secondary: '#FFC0E5',
     accent: '#FF85C0',
     emoji: '🌸'
   },
   3: { 
-    primary: '#B19CD9', 
+    primary: '#B19CD9',
     secondary: '#D4C5F9',
     accent: '#9D7FDB',
     emoji: '💜'
@@ -48,7 +54,10 @@ export default function LandingPage({ link }: LandingPageProps) {
   const [showIdentity, setShowIdentity] = useState(false)
   const [sparkles, setSparkles] = useState<Array<{left: number, top: number, delay: number, duration: number}>>([])
   const [noClickCount, setNoClickCount] = useState(0)
-  const theme = THEME_COLORS[link.theme_id]
+
+  const themeId = Number(link.theme_id)
+  const theme = THEME_COLORS[themeId]
+  const backgroundImage = THEME_BACKGROUNDS[themeId]
 
   useEffect(() => {
     setSparkles(generateSparkles())
@@ -244,14 +253,25 @@ export default function LandingPage({ link }: LandingPageProps) {
   }
 
   // DEFAULT STATE
-  return (
+   return (
     <div 
-      className="landing-bg min-h-screen flex items-center justify-center p-4 md:p-12 relative overflow-hidden"
+      className="min-h-screen flex items-center justify-center p-4 md:p-12 relative overflow-hidden"
       style={{
-        backgroundImage: `linear-gradient(135deg, ${theme.primary}15 0%, ${theme.secondary}25 100%), url('/background.jpg')`,
+        backgroundColor: theme.primary,
+        backgroundImage: backgroundImage
+          ? `
+            linear-gradient(
+              135deg,
+              ${theme.primary}15 0%,
+              ${theme.secondary}25 100%
+            ),
+            url(${backgroundImage})
+          `
+          : undefined,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed',
       }}
     >
       {/* Border */}
@@ -303,7 +323,10 @@ export default function LandingPage({ link }: LandingPageProps) {
           className="text-5xl md:text-6xl font-display font-bold break-words leading-tight" 
           style={{ 
             color: '#FFFFFF',
-            textShadow: '0 3px 10px rgba(0,0,0,0.8), 0 6px 20px rgba(0,0,0,0.6), 0 0 40px rgba(255,182,193,0.5), 2px 2px 0 rgba(0,0,0,0.3)'
+            textShadow: `
+              0 2px 6px rgba(0,0,0,0.35),
+              0 0 18px rgba(255,255,255,0.35)
+            `
           }}
         >
           Hey {link.recipient_name}! 
