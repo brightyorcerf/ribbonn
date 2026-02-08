@@ -9,7 +9,7 @@ type Theme = {
   name: string
   primary: string
   secondary: string
-  bgClass: string
+  gradient: string
   emoji: string
 }
 
@@ -19,7 +19,7 @@ const THEMES: Theme[] = [
     name: 'Classic Red', 
     primary: '#E60012', 
     secondary: '#FFB3D9',
-    bgClass: 'bg-sanrio-red',
+    gradient: 'from-[#ff85a1] via-[#ff4d6d] to-[#c9184a]',
     emoji: '❤️'
   },
   { 
@@ -27,7 +27,7 @@ const THEMES: Theme[] = [
     name: 'Soft Pink', 
     primary: '#FFB3D9', 
     secondary: '#FFC0E5',
-    bgClass: 'bg-sanrio-pink',
+    gradient: 'from-[#FFB3D9] via-[#FFC0E5] to-[#FFD1ED]',
     emoji: '🌸'
   },
   { 
@@ -35,7 +35,7 @@ const THEMES: Theme[] = [
     name: 'Cyber Lavender', 
     primary: '#B19CD9', 
     secondary: '#D4C5F9',
-    bgClass: 'bg-sanrio-lavender',
+    gradient: 'from-[#B19CD9] via-[#D4C5F9] to-[#E8DDFF]',
     emoji: '💜'
   },
 ]
@@ -127,6 +127,11 @@ export default function Generator() {
 
     setIsGenerating(true)
 
+    // Add haptic feedback for mobile devices
+    if ('vibrate' in navigator) {
+      navigator.vibrate(10)
+    }
+
     try {
       const slug = nanoid(8)
       let iconUrl = null
@@ -202,195 +207,225 @@ export default function Generator() {
   }
 
   return (
-    <div className="w-full max-w-3xl mx-auto px-6 py-10">
-      
-      {/* Header */}
-      <div className="text-center mb-16">
-        <h1 className="text-5xl md:text-7xl font-display text-sanrio-red mb-6 animate-float">
-          Ribbon 🎀
-        </h1>
-        <p className="text-lg md:text-xl font-mono text-chocolate/70">
-          Create a link. Send it. Watch them say yes.
-        </p>
-      </div>
-
-      {generatedUrl ? (
-        // SUCCESS STATE
-        <div className="bg-white p-10 md:p-12 rounded-chunky border-4 border-chocolate shadow-hard-chocolate space-y-8">
-          <h2 className="text-3xl md:text-4xl font-display text-center text-chocolate">
-            ✨ Your Link is Ready! ✨
-          </h2>
-          
-          <div className="bg-cream p-6 rounded-chunky border-2 border-chocolate/20 break-all font-mono text-sm">
-            {generatedUrl}
-          </div>
-
-          <p className="text-center text-chocolate/70 font-mono text-sm">
-            📋 Message copied to clipboard!
+    <div 
+      className="min-h-screen w-full flex items-center justify-center p-4 md:p-6"
+      style={{
+        backgroundImage: 'url(/background2.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      {/* Floating Capsule Container */}
+      <div className="w-full max-w-[480px] relative z-10">
+        
+        {/* Header - Always visible */}
+        <div className="text-center mb-8 md:mb-12 animate-float-in">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-display text-white mb-3 drop-shadow-[0_8px_30px_rgba(0,0,0,0.4)] animate-float" style={{ textShadow: '0 2px 4px rgba(61,40,23,0.3), 0 4px 20px rgba(255,182,193,0.8)' }}>
+            Ribbon 💌
+          </h1>
+          <p className="text-base md:text-lg font-bold text-white drop-shadow-lg" style={{ textShadow: '0 2px 8px rgba(61,40,23,0.5), 0 0 20px rgba(255,182,193,0.6)' }}>
+            Create a link. Send it. Watch them say yes.
           </p>
-
-          <button
-            onClick={handleReset}
-            className="w-full bg-sanrio-lavender text-white font-display text-xl py-5 px-8 rounded-chunky border-4 border-chocolate shadow-hard hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
-          >
-            Make Another One 🎀
-          </button>
         </div>
-      ) : (
-        // FORM STATE
-        <div className="bg-white p-10 md:p-12 rounded-chunky border-4 border-chocolate shadow-hard-chocolate space-y-10">
-          
-          {/* Error */}
-          {errorMessage && (
-            <div className="p-6 bg-red-50 border-4 border-red-300 rounded-chunky">
-              <p className="font-mono text-red-700 text-sm">⚠️ {errorMessage}</p>
+
+        {generatedUrl ? (
+          // SUCCESS STATE - Reveal animation
+          <div className="aero-glass rounded-[2rem] p-8 md:p-10 space-y-6 animate-reveal">
+            <div className="text-center space-y-4">
+              <div className="text-6xl animate-bounce-in">✨</div>
+              <h2 className="text-2xl md:text-3xl font-display text-chocolate">
+                Your Link is Ready!
+              </h2>
             </div>
-          )}
-
-          {/* Recipient Name */}
-          <div className="space-y-4">
-            <label className="block font-display text-2xl text-chocolate">
-              Who's the lucky one? 💝
-            </label>
-            <input
-              type="text"
-              value={recipientName}
-              onChange={(e) => setRecipientName(e.target.value)}
-              maxLength={15}
-              placeholder="Their name..."
-              className="w-full px-6 py-5 font-mono border-4 border-chocolate rounded-chunky focus:outline-none focus:ring-4 focus:ring-sanrio-pink/50 bg-cream text-base"
-            />
-            <p className="text-sm font-mono text-chocolate/50 px-2">
-              {recipientName.length}/15 characters
-            </p>
-          </div>
-
-          {/* Anonymous Toggle */}
-          <div className="bg-cream p-6 rounded-chunky border-2 border-chocolate/20">
-            <label className="flex items-start gap-5 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={isAnonymous}
-                onChange={(e) => setIsAnonymous(e.target.checked)}
-                className="w-6 h-6 mt-1 rounded border-2 border-chocolate flex-shrink-0"
-              />
-              <div className="space-y-2">
-                <span className="font-display text-xl block text-chocolate">
-                  🎭 Send Anonymously
-                </span>
-                <span className="font-mono text-sm text-chocolate/60 block">
-                  Your identity will only be revealed if they say yes!
-                </span>
-              </div>
-            </label>
-          </div>
-
-          {/* Creator Name */}
-          <div className="space-y-4">
-            <label className="block font-display text-2xl text-chocolate">
-              What's your name? ✨
-              {isAnonymous && (
-                <span className="text-sm font-mono text-chocolate/60 block mt-3 font-normal">
-                  (Kept secret until they say yes)
-                </span>
-              )}
-            </label>
-            <input
-              type="text"
-              value={creatorName}
-              onChange={(e) => setCreatorName(e.target.value)}
-              maxLength={20}
-              placeholder="Your name..."
-              className="w-full px-6 py-5 font-mono border-4 border-chocolate rounded-chunky focus:outline-none focus:ring-4 focus:ring-sanrio-pink/50 bg-cream text-base"
-            />
-          </div>
-
-          {/* Theme Selector */}
-          <div className="space-y-4">
-            <label className="block font-display text-2xl text-chocolate">
-              Pick a vibe 🎨
-            </label>
-            <div className="grid grid-cols-3 gap-5">
-              {THEMES.map((theme) => (
-                <button
-                  key={theme.id}
-                  onClick={() => setSelectedTheme(theme)}
-                  className={`p-5 rounded-chunky border-4 transition-all ${
-                    selectedTheme.id === theme.id
-                      ? 'border-chocolate shadow-hard scale-105'
-                      : 'border-chocolate/30 hover:border-chocolate/50'
-                  }`}
-                >
-                  <div className={`w-full h-14 rounded-chunky ${theme.bgClass} mb-3 flex items-center justify-center text-2xl`}>
-                    {theme.emoji}
-                  </div>
-                  <p className="font-mono text-sm text-chocolate">{theme.name}</p>
-                </button>
-              ))}
+            
+            <div className="glass-inset rounded-2xl p-5 break-all font-mono text-sm text-chocolate/90">
+              {generatedUrl}
             </div>
+
+            <div className="flex items-center justify-center gap-2 text-chocolate/70 font-mono text-sm">
+              <span className="text-lg">📋</span>
+              <span>Message copied to clipboard!</span>
+            </div>
+
+            <button
+              onClick={handleReset}
+              className="btn-plastic w-full"
+            >
+              Make Another One 
+            </button>
           </div>
-
-          {/* Image Upload */}
-          <div className="space-y-4">
-            <label className="block font-display text-2xl text-chocolate">
-              Add your face (optional) 📸
-            </label>
-
-            {iconFile ? (
-              <div className="flex items-center justify-between p-6 bg-cream rounded-chunky border-2 border-chocolate/20">
-                <p className="font-mono text-sm text-chocolate/70">
-                  ✅ Image uploaded
+        ) : (
+          // FORM STATE - With evaporation transition
+          <div className={`aero-glass rounded-[2rem] p-6 md:p-10 space-y-7 transition-all duration-700 ${
+            isGenerating ? 'scale-110 blur-xl opacity-0 pointer-events-none' : 'scale-100 blur-0 opacity-100'
+          }`}>
+            
+            {/* Error */}
+            {errorMessage && (
+              <div className="glass-error rounded-2xl p-5 border-2 border-red-300/60 backdrop-blur-xl animate-shake">
+                <p className="font-mono text-red-700 text-sm flex items-center gap-2">
+                  <span>⚠️</span>
+                  <span>{errorMessage}</span>
                 </p>
-                <button
-                  onClick={() => {
-                    setIconFile(null)
-                    setIconPreview(null)
-                  }}
-                  className="font-mono text-sm text-red-600 hover:text-red-700 underline"
-                >
-                  Remove
-                </button>
               </div>
-            ) : (
-              <label className="block w-full p-12 border-4 border-dashed border-chocolate/30 rounded-chunky cursor-pointer hover:border-chocolate/50 hover:bg-cream/50 transition-colors bg-cream">
+            )}
+
+            {/* Recipient Name */}
+            <div className="space-y-3">
+              <label className="block font-display text-xl md:text-2xl text-chocolate/90">
+                Who's the lucky one? 💝
+              </label>
+              <input
+                type="text"
+                value={recipientName}
+                onChange={(e) => setRecipientName(e.target.value)}
+                maxLength={15}
+                placeholder="Their name..."
+                className="aero-input"
+              />
+              <p className="text-xs font-mono text-chocolate/50 px-2">
+                {recipientName.length}/15 characters
+              </p>
+            </div>
+
+            {/* Anonymous Toggle */}
+            <div className="glass-panel rounded-2xl p-5">
+              <label className="flex items-start gap-4 cursor-pointer group">
                 <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
+                  type="checkbox"
+                  checked={isAnonymous}
+                  onChange={(e) => setIsAnonymous(e.target.checked)}
+                  className="peer sr-only"
                 />
-                <div className="text-center space-y-3">
-                  <p className="font-display text-5xl">📷</p>
-                  <p className="font-mono text-chocolate/70 text-base">
-                    Click to upload an image
-                  </p>
-                  <p className="font-mono text-chocolate/50 text-sm">
-                    Max 5MB
-                  </p>
+                <div className="heart-checkbox">
+                  <span className="peer-checked:hidden text-2xl opacity-40">🤍</span>
+                  <span className="hidden peer-checked:inline text-2xl animate-heart-pop">💖</span>
+                </div>
+                <div className="flex-1 space-y-1.5">
+                  <span className="font-display text-lg block text-chocolate/90 group-hover:text-chocolate transition-colors">
+                    🎭 Send Anonymously
+                  </span>
+                  <span className="font-mono text-xs text-chocolate/60 block leading-relaxed">
+                    Your identity will only be revealed if they say yes!
+                  </span>
                 </div>
               </label>
-            )}
+            </div>
+
+            {/* Creator Name */}
+            <div className="space-y-3">
+              <label className="block font-display text-xl md:text-2xl text-chocolate/90">
+                What's your name? ✨
+                {isAnonymous && (
+                  <span className="text-xs font-mono text-chocolate/60 block mt-2 font-normal">
+                    (Kept secret until they say yes)
+                  </span>
+                )}
+              </label>
+              <input
+                type="text"
+                value={creatorName}
+                onChange={(e) => setCreatorName(e.target.value)}
+                maxLength={20}
+                placeholder="Your name..."
+                className="aero-input"
+              />
+            </div>
+
+            {/* Theme Selector */}
+            <div className="space-y-3">
+              <label className="block font-display text-xl md:text-2xl text-chocolate/90">
+                Pick a vibe 🎨
+              </label>
+              <div className="grid grid-cols-3 gap-3">
+                {THEMES.map((theme) => (
+                  <button
+                    key={theme.id}
+                    onClick={() => setSelectedTheme(theme)}
+                    className={`vibe-card aspect-square rounded-3xl p-3 transition-all duration-300 min-h-[48px] ${
+                      selectedTheme.id === theme.id
+                        ? 'vibe-card-selected scale-105'
+                        : 'hover:scale-102'
+                    }`}
+                  >
+                    <div className={`w-full h-full rounded-2xl bg-gradient-to-br ${theme.gradient} flex items-center justify-center text-2xl md:text-3xl shadow-inner border-t-4 border-white/80`}>
+                      {theme.emoji}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Image Upload */}
+            <div className="space-y-3">
+              <label className="block font-display text-xl md:text-2xl text-chocolate/90">
+                Add an image  (optional) 
+              </label>
+
+              {iconFile ? (
+                <div className="glass-panel rounded-2xl p-5 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    {iconPreview && (
+                      <img 
+                        src={iconPreview} 
+                        alt="Preview" 
+                        className="w-12 h-12 rounded-xl object-cover border-2 border-white/60"
+                      />
+                    )}
+                    <p className="font-mono text-sm text-chocolate/70">
+                      Image uploaded
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setIconFile(null)
+                      setIconPreview(null)
+                    }}
+                    className="font-mono text-sm text-red-600 hover:text-red-700 underline transition-colors"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ) : (
+                <label className="upload-zone block w-full p-8 md:p-10 border-2 border-dashed border-white/40 rounded-2xl cursor-pointer hover:border-white/60 hover:bg-white/10 transition-all backdrop-blur-sm">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                  <div className="text-center space-y-2">
+                    <p className="text-4xl">📷</p>
+                    <p className="font-mono text-chocolate/70 text-sm">
+                      Click to upload
+                    </p>
+                    <p className="font-mono text-chocolate/50 text-xs">
+                      Max 5MB
+                    </p>
+                  </div>
+                </label>
+              )}
+            </div>
+
+            {/* Generate Button */}
+            <button
+              onClick={handleGenerate}
+              disabled={isGenerating}
+              className="btn-plastic w-full disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
+            >
+              {isGenerating ? (
+                <span className="flex items-center justify-center gap-3">
+                  <span className="animate-spin">⏳</span>
+                  Creating Magic...
+                </span>
+              ) : (
+                'Generate My Link'
+              )}
+            </button>
           </div>
-
-          {/* Generate Button */}
-          <button
-            onClick={handleGenerate}
-            disabled={isGenerating}
-            className="w-full bg-sanrio-red text-white font-display text-2xl py-6 px-8 rounded-chunky border-4 border-chocolate shadow-hard-chocolate hover:translate-x-2 hover:translate-y-2 hover:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-x-0 disabled:hover:translate-y-0"
-          >
-            {isGenerating ? (
-              <span className="flex items-center justify-center gap-3">
-                <span className="animate-spin">⏳</span>
-                Creating Magic...
-              </span>
-            ) : (
-              'Generate My Link 🎀'
-            )}
-          </button>
-        </div>
-      )}
-
-      {/* Background Image at Bottom */}
+        )}
+      </div>
     </div>
   )
 }

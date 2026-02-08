@@ -11,10 +11,10 @@ const fredoka = Fredoka({
   weight: ["500", "600"],
 });
 
-// Clean, friendly body font
+// Clean, friendly body / mono font
 const quicksand = Quicksand({
   subsets: ["latin"],
-  variable: "--font-body",
+  variable: "--font-mono", // ✅ MUST match globals.css
   weight: ["400", "500"],
 });
 
@@ -33,14 +33,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body
-        className={`
-          ${fredoka.variable}
-          ${quicksand.variable}
-          antialiased
-        `}
-      >
+    <html
+      lang="en"
+      className={`${fredoka.variable} ${quicksand.variable}`}
+    >
+      <body className="antialiased">
         {children}
       </body>
     </html>

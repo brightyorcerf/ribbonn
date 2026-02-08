@@ -167,7 +167,7 @@ export default function LandingPage({ link }: LandingPageProps) {
                 className="font-display text-6xl break-words"
                 style={{ color: theme.primary }}
               >
-                {link.creator_name}! 💝
+                {link.creator_name}! 
               </p>
             </div>
           )}
@@ -246,9 +246,12 @@ export default function LandingPage({ link }: LandingPageProps) {
   // DEFAULT STATE
   return (
     <div 
-      className="min-h-screen flex items-center justify-center p-8 md:p-12 relative overflow-hidden"
+      className="landing-bg min-h-screen flex items-center justify-center p-4 md:p-12 relative overflow-hidden"
       style={{
-        background: `linear-gradient(135deg, ${theme.primary}15 0%, ${theme.secondary}25 100%)`
+        backgroundImage: `linear-gradient(135deg, ${theme.primary}15 0%, ${theme.secondary}25 100%), url('/background.jpg')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
       }}
     >
       {/* Border */}
@@ -297,22 +300,34 @@ export default function LandingPage({ link }: LandingPageProps) {
 
         {/* Greeting */}
         <h1 
-          className="text-5xl md:text-6xl font-display break-words leading-tight" 
-          style={{ color: theme.primary }}
+          className="text-5xl md:text-6xl font-display font-bold break-words leading-tight" 
+          style={{ 
+            color: '#FFFFFF',
+            textShadow: '0 3px 10px rgba(0,0,0,0.8), 0 6px 20px rgba(0,0,0,0.6), 0 0 40px rgba(255,182,193,0.5), 2px 2px 0 rgba(0,0,0,0.3)'
+          }}
         >
-          Hey {link.recipient_name}! 👋
+          Hey {link.recipient_name}! 
         </h1>
 
         {/* From */}
         {!link.is_anonymous && link.creator_name && (
-          <p className="text-2xl font-mono text-chocolate/70 break-words">
-            From: <span style={{ color: theme.accent }}>{link.creator_name}</span> 💝
+          <p 
+            className="text-2xl font-mono font-bold break-words"
+            style={{ 
+              color: '#FFFFFF',
+              textShadow: '0 3px 10px rgba(0,0,0,0.8), 0 6px 20px rgba(0,0,0,0.6), 2px 2px 0 rgba(0,0,0,0.3)'
+            }}
+          >
+            From: <span style={{ 
+              color: '#FFFFFF',
+              textShadow: '0 3px 10px rgba(0,0,0,0.8), 0 6px 20px rgba(0,0,0,0.6), 0 0 30px rgba(255,182,193,0.6), 2px 2px 0 rgba(0,0,0,0.3)'
+            }}>{link.creator_name}</span> 
           </p>
         )}
 
         {/* Question card */}
-        <div className="bg-white p-10 md:p-12 rounded-chunky border-4 border-chocolate shadow-hard-chocolate space-y-10">
-          <p className="text-4xl md:text-5xl font-display text-chocolate leading-tight">
+        <div className="bg-white p-6 md:p-12 rounded-chunky border-4 border-chocolate shadow-hard-chocolate space-y-6 md:space-y-10">
+          <p className="text-3xl md:text-5xl font-display text-chocolate leading-tight">
             Will you be mine? 💕
           </p>
 
