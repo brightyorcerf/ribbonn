@@ -150,7 +150,21 @@ export default function LandingPage({ link }: LandingPageProps) {
       <div 
         className="min-h-screen flex items-center justify-center p-8 md:p-12"
         style={{
-          background: `linear-gradient(135deg, ${theme.primary}15 0%, ${theme.secondary}25 100%)`
+          backgroundColor: theme.primary,
+          backgroundImage: backgroundImage
+            ? `
+              linear-gradient(
+                135deg,
+                ${theme.primary}15 0%,
+                ${theme.secondary}25 100%
+              ),
+              url(${backgroundImage})
+            `
+            : undefined,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed',
         }}
       >
         <div 
