@@ -335,28 +335,21 @@ export default function Generator() {
             <label className="block font-display text-2xl text-chocolate">
               Add your face (optional) 📸
             </label>
-            
-            {iconPreview ? (
-              <div className="flex items-center gap-6 p-6 bg-cream rounded-chunky border-2 border-chocolate/20">
-                <img
-                  src={iconPreview}
-                  alt="Preview"
-                  className="w-16 h-16 rounded-full border-4 border-chocolate shadow-hard object-cover flex-shrink-0"
-                />
-                <div className="flex-1 min-w-0">
-                  <p className="font-mono text-sm text-chocolate/70 mb-3 truncate">
-                    {iconFile?.name}
-                  </p>
-                  <button
-                    onClick={() => {
-                      setIconFile(null)
-                      setIconPreview(null)
-                    }}
-                    className="font-mono text-sm text-red-600 hover:text-red-700 underline"
-                  >
-                    Remove image
-                  </button>
-                </div>
+
+            {iconFile ? (
+              <div className="flex items-center justify-between p-6 bg-cream rounded-chunky border-2 border-chocolate/20">
+                <p className="font-mono text-sm text-chocolate/70">
+                  ✅ Image uploaded
+                </p>
+                <button
+                  onClick={() => {
+                    setIconFile(null)
+                    setIconPreview(null)
+                  }}
+                  className="font-mono text-sm text-red-600 hover:text-red-700 underline"
+                >
+                  Remove
+                </button>
               </div>
             ) : (
               <label className="block w-full p-12 border-4 border-dashed border-chocolate/30 rounded-chunky cursor-pointer hover:border-chocolate/50 hover:bg-cream/50 transition-colors bg-cream">
@@ -398,13 +391,6 @@ export default function Generator() {
       )}
 
       {/* Background Image at Bottom */}
-      <div className="mt-16 flex justify-center">
-        <img 
-          src="/background.jpg" 
-          alt="Decoration"
-          className="max-w-md w-full h-auto rounded-chunky border-4 border-chocolate shadow-hard-chocolate"
-        />
-      </div>
     </div>
   )
 }
