@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase, type Link } from '@/lib/supabase'
 import gsap from 'gsap'
 
@@ -54,9 +54,11 @@ export default function LandingPage({ link }: LandingPageProps) {
   const [showIdentity, setShowIdentity] = useState(false)
   const [sparkles, setSparkles] = useState<Array<{left: number, top: number, delay: number, duration: number}>>([])
   const [noClickCount, setNoClickCount] = useState(0)
+  const [isProcessing, setIsProcessing] = useState(false)
+  const confettiCreatedRef = useRef(false) // ✅ FIXED: Prevent confetti spam
 
   const themeId = Number(link.theme_id)
-  const theme = THEME_COLORS[themeId]
+  const theme = THEME_COLORS[themeId] || THEME_COLORS[1] // ✅ FIXED: Fallback theme
   const backgroundImage = THEME_BACKGROUNDS[themeId]
 
   useEffect(() => {
@@ -64,22 +66,40 @@ export default function LandingPage({ link }: LandingPageProps) {
   }, [])
 
   const handleYes = async () => {
-    await supabase
-      .from('links')
-      .update({ response: 'yes' })
-      .eq('slug', link.slug)
+    if (isProcessing) return // Prevent double-click
+    setIsProcessing(true)
 
-    setResponse('yes')
-    createConfetti()
-    
-    if (link.is_anonymous && link.creator_name) {
-      setTimeout(() => {
-        setShowIdentity(true)
-      }, 1500)
+    try {
+      const { error } = await supabase
+        .from('links')
+        .update({ response: 'yes' })
+        .eq('slug', link.slug)
+
+      if (error) {
+        console.error('Failed to update response:', error)
+        alert('Something went wrong. Please try again.')
+        setIsProcessing(false)
+        return
+      }
+
+      setResponse('yes')
+      createConfetti()
+      
+      if (link.is_anonymous && link.creator_name) {
+        setTimeout(() => {
+          setShowIdentity(true)
+        }, 1500)
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      alert('Something went wrong. Please try again.')
+      setIsProcessing(false)
     }
   }
 
   const handleNo = () => {
+    if (isProcessing) return
+    
     if (noClickCount < 3) {
       const button = document.getElementById('no-button')
       if (button) {
@@ -98,21 +118,42 @@ export default function LandingPage({ link }: LandingPageProps) {
   }
 
   const finalNo = async () => {
-    await supabase
-      .from('links')
-      .update({ response: 'no' })
-      .eq('slug', link.slug)
+    if (isProcessing) return
+    setIsProcessing(true)
 
-    setResponse('no')
-    document.body.style.filter = 'grayscale(100%)'
+    try {
+      const { error } = await supabase
+        .from('links')
+        .update({ response: 'no' })
+        .eq('slug', link.slug)
+
+      if (error) {
+        console.error('Failed to update response:', error)
+        alert('Something went wrong. Please try again.')
+        setIsProcessing(false)
+        return
+      }
+
+      setResponse('no')
+      document.body.style.filter = 'grayscale(100%)'
+    } catch (error) {
+      console.error('Error:', error)
+      alert('Something went wrong. Please try again.')
+      setIsProcessing(false)
+    }
   }
 
+  // ✅ FIXED: Prevent confetti spam with ref
   const createConfetti = () => {
+    if (confettiCreatedRef.current) return
+    confettiCreatedRef.current = true
+
     const confettiCount = 40
 
     for (let i = 0; i < confettiCount; i++) {
       const confetti = document.createElement('div')
       confetti.textContent = i % 2 === 0 ? theme.emoji : '✨'
+      confetti.setAttribute('data-confetti', 'true') // Mark for cleanup
       confetti.style.cssText = `
         position: fixed;
         font-size: ${16 + Math.random() * 12}px;
@@ -144,44 +185,66 @@ export default function LandingPage({ link }: LandingPageProps) {
     }
   }
 
+  // ✅ IMPROVED: Background with fallback
+  const getBackgroundStyle = () => {
+    const baseStyle = {
+      backgroundColor: theme.primary,
+      backgroundSize: 'cover' as const, 
+      backgroundPosition: 'center top' as const,
+      backgroundRepeat: 'no-repeat' as const,
+    }
+
+    if (backgroundImage) {
+      return {
+        ...baseStyle,
+        backgroundImage: `
+          linear-gradient(
+            135deg,
+            ${theme.primary}15 0%,
+            ${theme.secondary}25 100%
+          ),
+          url(${backgroundImage})
+        `,
+      }
+    }
+
+    // Fallback gradient if image not available
+    return {
+      ...baseStyle,
+      backgroundImage: `
+        linear-gradient(
+          135deg,
+          ${theme.primary} 0%,
+          ${theme.secondary} 100%
+        )
+      `,
+    }
+  }
+
   // YES STATE
   if (response === 'yes') {
     return (
       <div 
         className="min-h-screen flex items-center justify-center p-8 md:p-12"
-        style={{
-          backgroundColor: theme.primary,
-          backgroundImage: backgroundImage
-            ? `
-              linear-gradient(
-                135deg,
-                ${theme.primary}15 0%,
-                ${theme.secondary}25 100%
-              ),
-              url(${backgroundImage})
-            `
-            : undefined,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundAttachment: 'fixed',
-        }}
+        style={getBackgroundStyle()}
       >
         <div 
           className="absolute inset-8 md:inset-16 border-8 rounded-[60px] pointer-events-none"
           style={{ borderColor: theme.primary }}
+          aria-hidden="true"
         />
 
         <div className="relative z-10 text-center max-w-2xl w-full px-8 space-y-10">
-          <h1 className="text-6xl md:text-8xl font-display text-white">
+          <p className="text-6xl md:text-8xl font-display text-white" role="status" aria-live="polite">
             🎉 YES! 🎉
-          </h1>
+          </p>
           
           {link.is_anonymous && link.creator_name && (
             <div 
               className={`bg-white p-10 rounded-chunky border-4 border-chocolate shadow-hard-chocolate space-y-5 transition-all duration-500 ${
                 showIdentity ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
               }`}
+              aria-live="polite"
             >
               <p className="font-display text-3xl text-chocolate">
                 It was...
@@ -235,9 +298,9 @@ export default function LandingPage({ link }: LandingPageProps) {
     return (
       <div className="min-h-screen flex items-center justify-center p-8 md:p-12 bg-cream">
         <div className="text-center max-w-2xl w-full px-8 space-y-10">
-          <h1 className="text-6xl md:text-8xl font-display text-chocolate/50">
+          <p className="text-6xl md:text-8xl font-display text-chocolate/50" role="status" aria-live="polite">
             💔
-          </h1>
+          </p>
           
           <p className="text-4xl font-display text-chocolate/70">
             That's heartbreaking...
@@ -267,41 +330,26 @@ export default function LandingPage({ link }: LandingPageProps) {
   }
 
   // DEFAULT STATE
-   return (
+  return (
     <div 
       className="min-h-screen flex items-center justify-center p-4 md:p-12 relative overflow-hidden"
-      style={{
-        backgroundColor: theme.primary,
-        backgroundImage: backgroundImage
-          ? `
-            linear-gradient(
-              135deg,
-              ${theme.primary}15 0%,
-              ${theme.secondary}25 100%
-            ),
-            url(${backgroundImage})
-          `
-          : undefined,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed',
-      }}
+      style={getBackgroundStyle()}
     >
       {/* Border */}
       <div 
         className="absolute inset-8 md:inset-16 border-8 rounded-[60px] pointer-events-none"
         style={{ borderColor: theme.primary }}
+        aria-hidden="true"
       />
 
       {/* Corner emojis */}
-      <div className="absolute top-12 left-12 text-4xl opacity-40">{theme.emoji}</div>
-      <div className="absolute top-12 right-12 text-4xl opacity-40">{theme.emoji}</div>
-      <div className="absolute bottom-12 left-12 text-4xl opacity-40">{theme.emoji}</div>
-      <div className="absolute bottom-12 right-12 text-4xl opacity-40">{theme.emoji}</div>
+      <div className="absolute top-12 left-12 text-4xl opacity-40" aria-hidden="true">{theme.emoji}</div>
+      <div className="absolute top-12 right-12 text-4xl opacity-40" aria-hidden="true">{theme.emoji}</div>
+      <div className="absolute bottom-12 left-12 text-4xl opacity-40" aria-hidden="true">{theme.emoji}</div>
+      <div className="absolute bottom-12 right-12 text-4xl opacity-40" aria-hidden="true">{theme.emoji}</div>
 
       {/* Sparkles */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
         {sparkles.map((sparkle, i) => (
           <div
             key={i}
@@ -326,15 +374,19 @@ export default function LandingPage({ link }: LandingPageProps) {
           <div className="flex justify-center">
             <img
               src={link.icon_url}
-              alt="Profile"
+              alt={`Profile picture for ${link.recipient_name}`}
               className="w-24 h-24 md:w-28 md:h-28 rounded-full border-6 border-chocolate shadow-hard-chocolate object-cover"
+              onError={(e) => {
+                // ✅ IMPROVED: Hide image if it fails to load
+                (e.target as HTMLImageElement).style.display = 'none'
+              }}
             />
           </div>
         )}
 
         {/* Greeting */}
-        <h1 
-          className="text-5xl md:text-6xl font-display font-bold break-words leading-tight" 
+        <p
+          className="text-3xl sm:text-4xl md:text-5xl font-display font-bold break-words leading-tight" 
           style={{ 
             color: '#FFFFFF',
             textShadow: `
@@ -344,7 +396,7 @@ export default function LandingPage({ link }: LandingPageProps) {
           }}
         >
           Hey {link.recipient_name}! 
-        </h1>
+        </p>
 
         {/* From */}
         {!link.is_anonymous && link.creator_name && (
@@ -372,7 +424,9 @@ export default function LandingPage({ link }: LandingPageProps) {
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
             <button
               onClick={handleYes}
-              className="bg-sanrio-red text-white font-display text-2xl py-5 px-14 rounded-chunky border-4 border-chocolate shadow-hard-chocolate hover:translate-x-2 hover:translate-y-2 hover:shadow-none transition-all"
+              disabled={isProcessing}
+              className="bg-sanrio-red text-white font-display text-2xl py-5 px-14 rounded-chunky border-4 border-chocolate shadow-hard-chocolate hover:translate-x-2 hover:translate-y-2 hover:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label="Say yes"
             >
               YES! 💝
             </button>
@@ -380,17 +434,19 @@ export default function LandingPage({ link }: LandingPageProps) {
             <button
               id="no-button"
               onClick={handleNo}
-              className="bg-chocolate/10 text-chocolate font-display text-2xl py-5 px-14 rounded-chunky border-4 border-chocolate/30 hover:border-chocolate/50 transition-all"
+              disabled={isProcessing}
+              className="bg-chocolate/10 text-chocolate font-display text-2xl py-5 px-14 rounded-chunky border-4 border-chocolate/30 hover:border-chocolate/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
                 transform: `scale(${1 - noClickCount * 0.25})`,
               }}
+              aria-label={getNoButtonText()}
             >
               {getNoButtonText()}
             </button>
           </div>
 
           {noClickCount > 0 && noClickCount < 3 && (
-            <p className="font-mono text-sm text-chocolate/60 animate-pulse pt-4">
+            <p className="font-mono text-sm text-chocolate/60 animate-pulse pt-4" role="status" aria-live="polite">
               {noClickCount === 1 && "Think about it..."}
               {noClickCount === 2 && "Last chance! 💔"}
             </p>
