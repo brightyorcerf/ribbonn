@@ -236,7 +236,7 @@ export default function LandingPage({ link }: LandingPageProps) {
 
         <div className="relative z-10 text-center max-w-2xl w-full px-8 space-y-10">
           <p className="text-6xl md:text-8xl font-display text-white" role="status" aria-live="polite">
-            🎉 YES! 🎉
+            🎉 YES!
           </p>
           
           {link.is_anonymous && link.creator_name && (
