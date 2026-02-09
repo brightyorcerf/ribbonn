@@ -10,7 +10,7 @@ type LandingPageProps = {
 
 const THEME_BACKGROUNDS: Record<number, string> = {
   1: '/backgrounds/bg1.jpg',
-  2: '/backgrounds/bg2.jpg',
+  2: '/backgrounds/bg4.jpg',
   3: '/backgrounds/bg3.jpg',
 }
 
