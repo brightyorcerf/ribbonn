@@ -33,6 +33,8 @@ Database Speed: PostgreSQL (Supabase) handles thousands of rows like a champion.
 Storage Space (The Real Bottleneck): This is where you might hit a limit first. You are resizing images to 400x400 JPEGs. 
 Supabase’s free tier typically caps storage at 1GB.  
 
+---
+
 ## Roadblocks I hit while buidling this
 
 ### 1. Client-Side Image Resizing Before Upload
