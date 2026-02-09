@@ -2,7 +2,7 @@
 
 Create a link. Send it. Watch them say yes.
 
-![image1.jpg]
+![img1.jpg]
 
 ---
 
@@ -38,7 +38,7 @@ Getting that Windows Vista-inspired aero glass effect to look identical across C
 ```  
 ---
 
-![image2.jpg]
+![img2.jpg]
 
 ---
 
@@ -81,4 +81,4 @@ Because asking someone out is scary. But it's also exciting, hopeful, and kinda 
 
 Built with way too much CSS
 
-![image3.jpg]
+![img3.jpg]
