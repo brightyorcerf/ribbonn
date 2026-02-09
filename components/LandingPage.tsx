@@ -281,7 +281,7 @@ export default function LandingPage({ link }: LandingPageProps) {
             href="/"
             className="inline-block bg-sanrio-red text-white font-display text-xl py-5 px-10 rounded-chunky border-4 border-chocolate shadow-hard hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
           >
-            Make Your Own Link 🎀
+            Make Your Own Link 
           </a>
         </div>
       </div>

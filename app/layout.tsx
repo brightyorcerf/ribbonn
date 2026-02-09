@@ -21,7 +21,7 @@ const quicksand = Quicksand({
 /* ---------------- Metadata ---------------- */
 
 export const metadata: Metadata = {
-  title: "Ribbon 🎀 – Make Your Ask",
+  title: "Ribbon, Make Your Ask",
   description: "Create a personalized link to ask your crush out",
 };
 

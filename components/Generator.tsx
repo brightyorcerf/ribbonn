@@ -40,7 +40,7 @@ const THEMES: Theme[] = [
   },
 ]
 
-// 🔒 SECURITY: Sanitize user input to prevent XSS
+// 🔒 security: Sanitize user input to prevent XSS
 const sanitizeInput = (input: string): string => {
   return input
     .trim()
